@@ -1,14 +1,17 @@
 const express = require('express');
 const students = require('./students.json');
 const fs = require('fs');
+const cors =require('cors');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
-const  port = 3000;
+const  port = process.env.PORT || 3000;
 
 app.listen(port, () =>{
-
+    console.log('server is listening on port ' + port);
 })
 
 app.get('/students', (req, res)=>{
@@ -23,6 +26,7 @@ app.post('/student', (req, res) => {
         "school": req.body.school
     }
 
+    console.log(student)
     students.push(student)
 
     fs.writeFileSync('students.json', JSON.stringify(students))
@@ -30,5 +34,15 @@ app.post('/student', (req, res) => {
 })
 
 app.get('/students/:id', (req, res) => {
-
+    const id = parseInt(req.params.id)
+    const student = search(id, students)
+    res.send(student)
 })
+
+function search(id, myArray){
+    for (let i=0; i < myArray.length; i++) {
+        if (myArray[i].id === id) {
+            return myArray[i];
+        }
+    }
+}
